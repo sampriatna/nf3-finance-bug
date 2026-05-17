@@ -841,6 +841,68 @@ function renderBersama() {
   <div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Nama Biaya</th><th>Total Nominal</th><th>Metode</th><th>Dibebankan Ke</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
 }
 
+// ============================================================
+// KATEGORI — localStorage helpers
+// ============================================================
+const DEFAULT_KAT_PENGELUARAN = ['Operasional','Bahan Baku','Gaji','Marketing','Maintenance','Lainnya'];
+const DEFAULT_KAT_UANGMASUK   = ['GoPay','OVO','ShopeePay','Dana','Transfer Bank','QRIS','Lainnya'];
+
+function getKatPengeluaran() {
+  try { const s=localStorage.getItem('nf3_kat_pengeluaran'); return s?JSON.parse(s):DEFAULT_KAT_PENGELUARAN.slice(); }
+  catch(e){ return DEFAULT_KAT_PENGELUARAN.slice(); }
+}
+function getKatUangMasuk() {
+  try { const s=localStorage.getItem('nf3_kat_uangmasuk'); return s?JSON.parse(s):DEFAULT_KAT_UANGMASUK.slice(); }
+  catch(e){ return DEFAULT_KAT_UANGMASUK.slice(); }
+}
+function saveKatPengeluaran(arr){ localStorage.setItem('nf3_kat_pengeluaran', JSON.stringify(arr)); }
+function saveKatUangMasuk(arr){ localStorage.setItem('nf3_kat_uangmasuk', JSON.stringify(arr)); }
+
+function addKategori(type) {
+  const inputId = type==='pengeluaran' ? 'katPengeluaranInput' : 'katUangMasukInput';
+  const val = document.getElementById(inputId)?.value.trim();
+  if (!val) { showToast('Nama kategori tidak boleh kosong','error'); return; }
+  if (type==='pengeluaran') {
+    const arr = getKatPengeluaran();
+    if (arr.includes(val)) { showToast('Kategori sudah ada','warning'); return; }
+    arr.push(val); saveKatPengeluaran(arr);
+  } else {
+    const arr = getKatUangMasuk();
+    if (arr.includes(val)) { showToast('Kategori sudah ada','warning'); return; }
+    arr.push(val); saveKatUangMasuk(arr);
+  }
+  showToast('Kategori ditambahkan','success');
+  renderPage('settings');
+}
+
+function hapusKategori(type, val) {
+  if (!confirm(`Hapus kategori "${val}"?`)) return;
+  if (type==='pengeluaran') {
+    const arr = getKatPengeluaran().filter(x=>x!==val);
+    saveKatPengeluaran(arr);
+  } else {
+    const arr = getKatUangMasuk().filter(x=>x!==val);
+    saveKatUangMasuk(arr);
+  }
+  showToast('Kategori dihapus','info');
+  renderPage('settings');
+}
+
+function renderKatList(type) {
+  const arr = type==='pengeluaran' ? getKatPengeluaran() : getKatUangMasuk();
+  const inputId = type==='pengeluaran' ? 'katPengeluaranInput' : 'katUangMasukInput';
+  const items = arr.map(v=>`
+    <div class="settings-item">
+      <div class="settings-item-label">${v}</div>
+      <button class="btn btn-outline btn-sm btn-icon" onclick="hapusKategori('${type}','${v.replace(/'/g,"\\'")}')">✕</button>
+    </div>`).join('') || '<div style="color:var(--text-muted);font-size:13px">Belum ada kategori</div>';
+  return `${items}
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <input id="${inputId}" type="text" placeholder="Nama kategori baru..." style="flex:1;padding:8px 10px;background:var(--secondary);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px">
+      <button class="btn btn-primary btn-sm" onclick="addKategori('${type}')">+ Tambah</button>
+    </div>`;
+}
+
 function renderSettings() {
   const token = API_TOKEN ? API_TOKEN.substring(0,12)+'••••••••••••' : '(Demo mode)';
   const outletList = masterOutlets.map(o=>`
@@ -889,6 +951,14 @@ function renderSettings() {
     <div class="settings-card">
       <div class="settings-card-header">👤 PIC / Staf (${masterPIC.length})<button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="addPICModal()">+ Tambah</button></div>
       <div class="settings-card-body">${picList}</div>
+    </div>
+    <div class="settings-card">
+      <div class="settings-card-header">≡ Kategori Pengeluaran</div>
+      <div class="settings-card-body">${renderKatList('pengeluaran')}</div>
+    </div>
+    <div class="settings-card">
+      <div class="settings-card-header">↓ Sumber Uang Masuk</div>
+      <div class="settings-card-body">${renderKatList('uangmasuk')}</div>
     </div>
     <div class="settings-card">
       <div class="settings-card-header">App Web App Info</div>
@@ -942,8 +1012,7 @@ function showAddModal() {
         </div>
         <div class="form-row">
           <div class="form-group"><label>Kategori</label><select id="mKategori">
-            <option>Operasional</option><option>Bahan Baku</option><option>Gaji</option>
-            <option>Marketing</option><option>Maintenance</option><option>Lainnya</option>
+            ${getKatPengeluaran().map(k=>`<option>${k}</option>`).join('')}
           </select></div>
           <div class="form-group"><label>Sub Kategori</label><input type="text" id="mSubKat" placeholder="cth: Listrik, Gas, dll"></div>
         </div>
@@ -968,8 +1037,7 @@ function showAddModal() {
         </div>
         <div class="form-row">
           <div class="form-group"><label>Sumber</label><select id="mSumber">
-            <option>GoPay</option><option>OVO</option><option>ShopeePay</option><option>Dana</option>
-            <option>Transfer Bank</option><option>QRIS</option><option>Lainnya</option>
+            ${getKatUangMasuk().map(k=>`<option>${k}</option>`).join('')}
           </select></div>
           <div class="form-group"><label>Metode Pembayaran</label><select id="mMetode">
             <option>Transfer Bank</option><option>QRIS</option><option>E-Wallet</option><option>Cash</option>
