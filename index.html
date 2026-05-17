@@ -801,8 +801,212 @@ function renderMutasi() {
       <td><span class="badge ${sm==='Matched'?'badge-green':sm==='Tidak Dikenal'?'badge-red':'badge-yellow'}">${sm}</span></td>
     </tr>`;
   }).join('') : `<tr><td colspan="7" class="empty-state"><div class="icon">≡</div><div class="text">Belum ada data mutasi</div></td></tr>`;
-  return `<div class="section"><div class="section-header"><div class="section-title">≡ Mutasi Bank</div><button class="btn btn-primary btn-sm" onclick="showAddModal()">+ Input Mutasi</button></div>
-  <div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Rekening</th><th>Bank</th><th>Tipe</th><th>Nominal</th><th>Deskripsi</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
+  return `
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">≡ Mutasi Bank</div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-outline btn-sm" onclick="showUploadMutasiModal()">⬆ Upload CSV</button>
+        <button class="btn btn-primary btn-sm" onclick="showAddModal()">+ Input Manual</button>
+      </div>
+    </div>
+    <div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Rekening</th><th>Bank</th><th>Tipe</th><th>Nominal</th><th>Deskripsi</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div>
+  </div>
+  <!-- Upload CSV Modal -->
+  <div class="overlay" id="uploadMutasiOverlay" style="display:none;align-items:center;justify-content:center">
+    <div class="modal" style="max-width:640px;width:95%">
+      <div class="modal-header">
+        <div class="modal-title">⬆ Upload CSV Mutasi Bank</div>
+        <button class="btn btn-outline btn-sm btn-icon" onclick="closeUploadMutasi()">✕</button>
+      </div>
+      <div class="modal-body" id="uploadMutasiBody">
+        <div style="margin-bottom:12px">
+          <div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+            <select id="csvBankPilih" style="flex:1;min-width:120px;padding:8px;background:var(--secondary);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px">
+              <option value="">-- Pilih Bank --</option>
+              <option value="BCA">BCA</option>
+              <option value="BRI">BRI</option>
+              <option value="BNI">BNI</option>
+              <option value="Mandiri">Mandiri</option>
+              <option value="BSI">BSI</option>
+              <option value="Lainnya">Lainnya</option>
+            </select>
+            <input type="text" id="csvRekeningPilih" placeholder="No / Nama Rekening" style="flex:2;min-width:160px;padding:8px;background:var(--secondary);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:12px">
+          </div>
+          <div style="border:2px dashed var(--border);border-radius:8px;padding:24px;text-align:center;cursor:pointer" onclick="document.getElementById('csvFileInput').click()" id="csvDropZone">
+            <div style="font-size:24px;margin-bottom:6px">📄</div>
+            <div style="font-size:13px;color:var(--text-muted)">Klik atau drag CSV rekening koran di sini</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:4px">Format: Tanggal, Deskripsi, Debit, Kredit, Saldo (atau 2 kolom: Tanggal, Nominal+Deskripsi)</div>
+          </div>
+          <input type="file" id="csvFileInput" accept=".csv,.txt" style="display:none" onchange="parseCsvMutasi(this)">
+        </div>
+        <div id="csvPreviewArea" style="display:none">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div style="font-size:13px;font-weight:600" id="csvPreviewInfo"></div>
+            <button class="btn btn-outline btn-sm" onclick="document.getElementById('csvPreviewArea').style.display='none';document.getElementById('csvDropZone').style.display='block'">Ganti File</button>
+          </div>
+          <div class="table-wrap" style="max-height:280px;overflow-y:auto">
+            <table id="csvPreviewTable">
+              <thead><tr><th><input type="checkbox" id="csvCheckAll" onchange="toggleAllCsvRows(this)" checked></th><th>Tanggal</th><th>Deskripsi</th><th>Tipe</th><th>Nominal</th></tr></thead>
+              <tbody id="csvPreviewBody"></tbody>
+            </table>
+          </div>
+          <div style="margin-top:12px;font-size:12px;color:var(--text-muted)" id="csvTotalInfo"></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeUploadMutasi()">Batal</button>
+        <button class="btn btn-primary" id="btnSimpanCsv" onclick="simpanCsvMutasi()" style="display:none">💾 Simpan ke Airtable</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+let csvParsedRows = [];
+
+function showUploadMutasiModal() {
+  csvParsedRows = [];
+  document.getElementById('uploadMutasiOverlay').style.display = 'flex';
+  document.getElementById('csvPreviewArea').style.display = 'none';
+  document.getElementById('btnSimpanCsv').style.display = 'none';
+  document.getElementById('csvDropZone').style.display = 'block';
+  document.getElementById('csvFileInput').value = '';
+}
+function closeUploadMutasi() {
+  document.getElementById('uploadMutasiOverlay').style.display = 'none';
+}
+
+function toggleAllCsvRows(cb) {
+  document.querySelectorAll('.csv-row-check').forEach(c => c.checked = cb.checked);
+  updateCsvTotal();
+}
+
+function updateCsvTotal() {
+  const checked = document.querySelectorAll('.csv-row-check:checked').length;
+  const total = document.querySelectorAll('.csv-row-check').length;
+  document.getElementById('csvTotalInfo').textContent = `${checked} dari ${total} baris dipilih`;
+}
+
+function parseCsvMutasi(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const text = e.target.result;
+    const lines = text.split(/\r?\n/).filter(l => l.trim());
+    if (lines.length < 2) { showToast('File CSV kosong atau tidak valid','error'); return; }
+
+    // Deteksi separator
+    const sep = lines[0].includes(';') ? ';' : ',';
+    const headers = lines[0].split(sep).map(h => h.replace(/"/g,'').trim().toLowerCase());
+
+    // Cari kolom
+    const iDate   = headers.findIndex(h => h.includes('tanggal') || h.includes('date') || h.includes('tgl'));
+    const iDesc   = headers.findIndex(h => h.includes('deskripsi') || h.includes('ket') || h.includes('desc') || h.includes('keterangan') || h.includes('transaksi'));
+    const iDebit  = headers.findIndex(h => h.includes('debit') || h.includes('keluar') || h.includes('db'));
+    const iKredit = headers.findIndex(h => h.includes('kredit') || h.includes('masuk') || h.includes('cr'));
+    const iNominal= headers.findIndex(h => h.includes('nominal') || h.includes('jumlah') || h.includes('amount'));
+
+    csvParsedRows = [];
+    for (let i = 1; i < lines.length; i++) {
+      const cols = lines[i].split(sep).map(c => c.replace(/"/g,'').replace(/,/g,'').replace(/\./g,'').trim());
+      if (cols.every(c => !c)) continue;
+
+      let tgl = iDate >= 0 ? cols[iDate] : '';
+      let desc = iDesc >= 0 ? cols[iDesc] : cols.join(' ');
+      let debit = iDebit >= 0 ? parseFloat(cols[iDebit]) || 0 : 0;
+      let kredit = iKredit >= 0 ? parseFloat(cols[iKredit]) || 0 : 0;
+      let nominal = iNominal >= 0 ? parseFloat(cols[iNominal]) || 0 : 0;
+
+      // Normalisasi tanggal
+      tgl = normalizeTanggal(tgl);
+      if (!tgl) continue;
+
+      // Tentukan tipe & nominal
+      let tipe = 'Kredit', nilaiAkhir = 0;
+      if (debit > 0 && kredit > 0) {
+        tipe = 'Kredit'; nilaiAkhir = kredit;
+        csvParsedRows.push({tgl, desc, tipe:'Debit', nominal: debit});
+        tipe = 'Kredit'; nilaiAkhir = kredit;
+      } else if (debit > 0) {
+        tipe = 'Debit'; nilaiAkhir = debit;
+      } else if (kredit > 0) {
+        tipe = 'Kredit'; nilaiAkhir = kredit;
+      } else if (nominal > 0) {
+        tipe = 'Kredit'; nilaiAkhir = nominal;
+      } else continue;
+
+      if (nilaiAkhir > 0) csvParsedRows.push({tgl, desc: desc||'-', tipe, nominal: nilaiAkhir});
+    }
+
+    if (!csvParsedRows.length) { showToast('Tidak ada baris data yang bisa dibaca. Cek format CSV.','error'); return; }
+
+    // Render preview
+    document.getElementById('csvDropZone').style.display = 'none';
+    document.getElementById('csvPreviewArea').style.display = 'block';
+    document.getElementById('btnSimpanCsv').style.display = 'inline-block';
+    document.getElementById('csvPreviewInfo').textContent = `${csvParsedRows.length} baris ditemukan dari "${file.name}"`;
+
+    const tbody = document.getElementById('csvPreviewBody');
+    tbody.innerHTML = csvParsedRows.map((r,i) => `
+      <tr>
+        <td><input type="checkbox" class="csv-row-check" data-idx="${i}" checked onchange="updateCsvTotal()"></td>
+        <td>${r.tgl}</td>
+        <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis">${r.desc}</td>
+        <td><span class="badge ${r.tipe==='Kredit'?'badge-green':'badge-red'}">${r.tipe}</span></td>
+        <td>${fmtRp(r.nominal)}</td>
+      </tr>`).join('');
+    updateCsvTotal();
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+function normalizeTanggal(raw) {
+  if (!raw) return '';
+  raw = raw.trim();
+  // dd/mm/yyyy atau dd-mm-yyyy
+  let m = raw.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  if (m) return `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+  // yyyy-mm-dd
+  m = raw.match(/^(\d{4})[\/\-](\d{2})[\/\-](\d{2})$/);
+  if (m) return raw.substring(0,10);
+  // dd/mm/yy
+  m = raw.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2})$/);
+  if (m) return `20${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+  return '';
+}
+
+async function simpanCsvMutasi() {
+  const bank = document.getElementById('csvBankPilih')?.value || 'Lainnya';
+  const rekening = document.getElementById('csvRekeningPilih')?.value.trim() || '-';
+  const checked = [...document.querySelectorAll('.csv-row-check:checked')].map(c => parseInt(c.dataset.idx));
+  if (!checked.length) { showToast('Pilih minimal 1 baris','warning'); return; }
+
+  const btn = document.getElementById('btnSimpanCsv');
+  btn.disabled = true; btn.textContent = 'Menyimpan...';
+
+  let sukses = 0, gagal = 0;
+  for (const idx of checked) {
+    const r = csvParsedRows[idx];
+    const fields = {
+      'Tanggal': r.tgl,
+      'Rekening': rekening,
+      'Nominal': r.nominal,
+      'Deskripsi Mutasi': r.desc,
+    };
+    if (bank) fields['Bank'] = {name: bank};
+    if (r.tipe) fields['Tipe'] = {name: r.tipe};
+    try {
+      await airtableCreate(TABLES.mutasi, fields);
+      sukses++;
+    } catch(e) { gagal++; }
+  }
+
+  btn.disabled = false; btn.textContent = '💾 Simpan ke Airtable';
+  closeUploadMutasi();
+  showToast(`${sukses} mutasi disimpan${gagal?' ('+gagal+' gagal)':''}`, sukses?'success':'error');
+  await loadMutasi();
+  renderPage('mutasi');
 }
 
 function renderAsset() {
