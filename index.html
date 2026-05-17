@@ -242,22 +242,22 @@ tr:hover td{background:rgba(255,255,255,.02)}
   </div>
   <div class="nav">
     <div class="nav-section">Utama</div>
-    <div class="nav-item active" onclick="switchPage('dashboard')"><span class="icon">[D]</span>Dashboard</div>
+    <div class="nav-item active" onclick="switchPage('dashboard')"><span class="icon">≡</span>Dashboard</div>
     <div class="nav-section">Transaksi</div>
-    <div class="nav-item" onclick="switchPage('kas')"><span class="icon">[K]</span>Kas Harian</div>
-    <div class="nav-item" onclick="switchPage('pengeluaran')"><span class="icon">[B]</span>Pengeluaran</div>
-    <div class="nav-item" onclick="switchPage('uangmasuk')"><span class="icon">[M]</span>Uang Masuk</div>
-    <div class="nav-item" onclick="switchPage('marketplace')"><span class="icon">[S]</span>Marketplace</div>
-    <div class="nav-item" onclick="switchPage('mutasi')"><span class="icon">[Bk]</span>Mutasi Bank</div>
+    <div class="nav-item" onclick="switchPage('kas')"><span class="icon">$</span>Kas Harian</div>
+    <div class="nav-item" onclick="switchPage('pengeluaran')"><span class="icon">≡</span>Pengeluaran</div>
+    <div class="nav-item" onclick="switchPage('uangmasuk')"><span class="icon">↓</span>Uang Masuk</div>
+    <div class="nav-item" onclick="switchPage('marketplace')"><span class="icon">⊞</span>Marketplace</div>
+    <div class="nav-item" onclick="switchPage('mutasi')"><span class="icon">≡</span>Mutasi Bank</div>
     <div class="nav-section">Lainnya</div>
-    <div class="nav-item" onclick="switchPage('asset')"><span class="icon">[A]</span>Asset / Capex</div>
-    <div class="nav-item" onclick="switchPage('bersama')"><span class="icon">[Bs]</span>Biaya Bersama</div>
+    <div class="nav-item" onclick="switchPage('asset')"><span class="icon">≡</span>Asset / Capex</div>
+    <div class="nav-item" onclick="switchPage('bersama')"><span class="icon">≡</span>Biaya Bersama</div>
     <div class="nav-section">Sistem</div>
-    <div class="nav-item" onclick="switchPage('settings')"><span class="icon">[P]</span>Pengaturan</div>
+    <div class="nav-item" onclick="switchPage('settings')"><span class="icon">≡</span>Pengaturan</div>
   </div>
   <div class="sidebar-footer">
-    <button class="btn btn-outline btn-sm" onclick="refreshAll()" style="width:100%;margin-bottom:6px">[R] Refresh Data</button>
-    <button class="btn btn-outline btn-sm" onclick="resetToken()" style="width:100%;color:var(--red);border-color:var(--red)">[X] Logout</button>
+    <button class="btn btn-outline btn-sm" onclick="refreshAll()" style="width:100%;margin-bottom:6px">Refresh Data</button>
+    <button class="btn btn-outline btn-sm" onclick="resetToken()" style="width:100%;color:var(--red);border-color:var(--red)">Logout</button>
   </div>
 </div>
 
@@ -269,11 +269,11 @@ tr:hover td{background:rgba(255,255,255,.02)}
   <div class="topbar">
     <div class="topbar-left">
       <button class="hamburger" onclick="toggleSidebar()">☰</button>
-      <div class="topbar-title" id="topbarTitle">[D] <span>Dashboard</span></div>
+      <div class="topbar-title" id="topbarTitle">≡ <span>Dashboard</span></div>
     </div>
     <div class="topbar-actions">
       <button class="btn btn-primary btn-sm" id="topbarAddBtn" onclick="showAddModal()" style="display:none">+ Tambah</button>
-      <button class="btn btn-outline btn-sm" onclick="refreshAll()">[R]</button>
+      <button class="btn btn-outline btn-sm" onclick="refreshAll()">↺</button>
     </div>
   </div>
 
@@ -283,11 +283,11 @@ tr:hover td{background:rgba(255,255,255,.02)}
 <!-- BOTTOM NAV (mobile) -->
 <div class="bottom-nav">
   <div class="bottom-nav-inner">
-    <button class="bnav-item active" onclick="switchPage('dashboard')"><span class="icon">[D]</span>Dashboard</button>
-    <button class="bnav-item" onclick="switchPage('kas')"><span class="icon">[K]</span>Kas</button>
-    <button class="bnav-item" onclick="switchPage('pengeluaran')"><span class="icon">[B]</span>Keluar</button>
-    <button class="bnav-item" onclick="switchPage('uangmasuk')"><span class="icon">[M]</span>Masuk</button>
-    <button class="bnav-item" onclick="switchPage('settings')"><span class="icon">[P]</span>Setting</button>
+    <button class="bnav-item active" onclick="switchPage('dashboard')"><span class="icon">≡</span>Dashboard</button>
+    <button class="bnav-item" onclick="switchPage('kas')"><span class="icon">$</span>Kas</button>
+    <button class="bnav-item" onclick="switchPage('pengeluaran')"><span class="icon">≡</span>Keluar</button>
+    <button class="bnav-item" onclick="switchPage('uangmasuk')"><span class="icon">↓</span>Masuk</button>
+    <button class="bnav-item" onclick="switchPage('settings')"><span class="icon">≡</span>Setting</button>
   </div>
 </div>
 
@@ -403,9 +403,9 @@ async function initApp() {
     await loadMasterData();
     await loadKas();
     updateDashboard();
-    showToast('OK Data berhasil dimuat','success');
+    showToast('Data berhasil dimuat','success');
   } catch(e) {
-    showToast('ERROR Gagal: '+e.message,'error');
+    showToast('Gagal: '+e.message,'error');
   }
 }
 
@@ -415,9 +415,9 @@ async function refreshAll() {
     await loadMasterData();
     await loadPageData(currentPage);
     if (currentPage==='dashboard') updateDashboard();
-    showToast('OK Data diperbarui','success');
+    showToast('Data diperbarui','success');
   } catch(e) {
-    showToast('ERROR '+e.message,'error');
+    showToast('Gagal: '+e.message,'error');
   }
 }
 
@@ -591,7 +591,7 @@ function updateDashboard() {
   const grid = el('outletGrid');
   if (grid) {
     if (masterOutlets.length === 0) {
-      grid.innerHTML = '<div class="empty-state"><div class="icon">[O]</div><div class="text">Data outlet belum dimuat</div></div>';
+      grid.innerHTML = '<div class="empty-state"><div class="icon">⊙</div><div class="text">Data outlet belum dimuat</div></div>';
       return;
     }
     grid.innerHTML = masterOutlets.map(o => {
@@ -650,14 +650,14 @@ async function switchPage(page) {
   });
   closeSidebar();
   renderPage(page);
-  try { await loadPageData(page); renderPage(page); } catch(e) { showToast('ERROR '+e.message,'error'); }
+  try { await loadPageData(page); renderPage(page); } catch(e) { showToast('Gagal: '+e.message,'error'); }
 }
 
 function renderPage(page) {
   const titles = {
-    dashboard:'[D] Dashboard', kas:'[K] Kas Harian', pengeluaran:'[B] Pengeluaran',
-    uangmasuk:'[M] Uang Masuk', marketplace:'[S] Marketplace', mutasi:'[Bk] Mutasi Bank',
-    asset:'[A] Asset / Capex', bersama:'[Bs] Biaya Bersama', settings:'[P] Pengaturan'
+    dashboard:'≡ Dashboard', kas:'$ Kas Harian', pengeluaran:'≡ Pengeluaran',
+    uangmasuk:'↓ Uang Masuk', marketplace:'⊞ Marketplace', mutasi:'≡ Mutasi Bank',
+    asset:'≡ Asset / Capex', bersama:'≡ Biaya Bersama', settings:'≡ Pengaturan'
   };
   const addPages = ['kas','pengeluaran','uangmasuk','marketplace','mutasi','asset','bersama'];
   document.getElementById('topbarTitle').innerHTML = titles[page]||page;
@@ -685,18 +685,18 @@ function renderDashboard() {
   return `
   <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px" id="kpiDate">Memuat tanggal...</p>
   <div class="kpi-grid">
-    <div class="kpi-card green"><div class="label">[K] Total Omzet Hari Ini</div><div class="value" id="kpiOmzet">Rp 0</div></div>
-    <div class="kpi-card blue"><div class="label">[E] Entry Kas Hari Ini</div><div class="value" id="kpiEntry">0 outlet</div></div>
-    <div class="kpi-card yellow"><div class="label">[W] Belum Validasi</div><div class="value" id="kpiValidasi">0 entri</div></div>
+    <div class="kpi-card green"><div class="label">$ Total Omzet Hari Ini</div><div class="value" id="kpiOmzet">Rp 0</div></div>
+    <div class="kpi-card blue"><div class="label">≡ Entry Kas Hari Ini</div><div class="value" id="kpiEntry">0 outlet</div></div>
+    <div class="kpi-card yellow"><div class="label">◔ Belum Validasi</div><div class="value" id="kpiValidasi">0 entri</div></div>
     <div class="kpi-card red"><div class="label">🚨 Alert Selisih Kas</div><div class="value" id="kpiSelisih">0 alert</div></div>
   </div>
   <div class="section">
-    <div class="section-header"><div class="section-title">[O] Status per Outlet</div></div>
+    <div class="section-header"><div class="section-title">⊙ Status per Outlet</div></div>
     <div class="section-body"><div class="outlet-grid" id="outletGrid"><div class="loading"><div class="spinner"></div></div></div></div>
   </div>
   <div class="section">
     <div class="section-header">
-      <div class="section-title">[K] Kas Harian Terbaru</div>
+      <div class="section-title">$ Kas Harian Terbaru</div>
       <button class="btn btn-primary btn-sm" onclick="showAddModal()">+ Input Kas</button>
     </div>
     <div class="table-wrap">
@@ -724,8 +724,8 @@ function renderKas() {
       ${sv!=='Sudah Validasi'?`<button class="btn btn-green btn-sm" style="margin-left:4px" onclick="validasiKas('${r.id}')">✓</button>`:''}
       </td>
     </tr>`;
-  }).join('') : `<tr><td colspan="8" class="empty-state"><div class="icon">[K]</div><div class="text">Belum ada data kas</div></td></tr>`;
-  return `<div class="section"><div class="section-header"><div class="section-title">[K] Kas Harian</div><button class="btn btn-primary btn-sm" onclick="showAddModal()">+ Input Kas</button></div>
+  }).join('') : `<tr><td colspan="8" class="empty-state"><div class="icon">$</div><div class="text">Belum ada data kas</div></td></tr>`;
+  return `<div class="section"><div class="section-header"><div class="section-title">$ Kas Harian</div><button class="btn btn-primary btn-sm" onclick="showAddModal()">+ Input Kas</button></div>
   <div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Outlet</th><th>Kas Awal</th><th>Total Omzet</th><th>Pengeluaran</th><th>Kas Fisik</th><th>Selisih</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
 }
 
@@ -743,8 +743,8 @@ function renderPengeluaran() {
       <td>${f[FIELDS.pengeluaran.metode]?.name||'-'}</td>
       <td><span class="badge ${sv==='Approved'?'badge-green':'badge-yellow'}">${sv}</span></td>
     </tr>`;
-  }).join('') : `<tr><td colspan="7" class="empty-state"><div class="icon">[B]</div><div class="text">Belum ada data pengeluaran</div></td></tr>`;
-  return `<div class="section"><div class="section-header"><div class="section-title">[B] Pengeluaran</div><button class="btn btn-primary btn-sm" onclick="showAddModal()">+ Tambah</button></div>
+  }).join('') : `<tr><td colspan="7" class="empty-state"><div class="icon">≡</div><div class="text">Belum ada data pengeluaran</div></td></tr>`;
+  return `<div class="section"><div class="section-header"><div class="section-title">≡ Pengeluaran</div><button class="btn btn-primary btn-sm" onclick="showAddModal()">+ Tambah</button></div>
   <div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Outlet</th><th>Kategori</th><th>Deskripsi</th><th>Nominal</th><th>Metode</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
 }
 
@@ -762,8 +762,8 @@ function renderUangMasuk() {
       <td>${fmtRp(f[FIELDS.uangMasuk.nominalBersih]||0)}</td>
       <td><span class="badge ${sc==='Sudah Cair'?'badge-green':'badge-yellow'}">${sc}</span></td>
     </tr>`;
-  }).join('') : `<tr><td colspan="7" class="empty-state"><div class="icon">[M]</div><div class="text">Belum ada data uang masuk</div></td></tr>`;
-  return `<div class="section"><div class="section-header"><div class="section-title">[M] Uang Masuk</div><button class="btn btn-primary btn-sm" onclick="showAddModal()">+ Tambah</button></div>
+  }).join('') : `<tr><td colspan="7" class="empty-state"><div class="icon">↓</div><div class="text">Belum ada data uang masuk</div></td></tr>`;
+  return `<div class="section"><div class="section-header"><div class="section-title">↓ Uang Masuk</div><button class="btn btn-primary btn-sm" onclick="showAddModal()">+ Tambah</button></div>
   <div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Outlet</th><th>Sumber</th><th>Bruto</th><th>Fee</th><th>Bersih</th><th>Status Cair</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
 }
 
@@ -782,8 +782,8 @@ function renderMarketplace() {
       <td>${fmtRp(f[FIELDS.marketplace.totalBersih]||0)}</td>
       <td><span class="badge ${sr==='Approved'?'badge-green':'badge-yellow'}">${sr}</span></td>
     </tr>`;
-  }).join('') : `<tr><td colspan="8" class="empty-state"><div class="icon">[S]</div><div class="text">Belum ada data marketplace</div></td></tr>`;
-  return `<div class="section"><div class="section-header"><div class="section-title">[S] Upload Marketplace</div><button class="btn btn-primary btn-sm" onclick="showAddModal()">+ Upload</button></div>
+  }).join('') : `<tr><td colspan="8" class="empty-state"><div class="icon">⊞</div><div class="text">Belum ada data marketplace</div></td></tr>`;
+  return `<div class="section"><div class="section-header"><div class="section-title">⊞ Upload Marketplace</div><button class="btn btn-primary btn-sm" onclick="showAddModal()">+ Upload</button></div>
   <div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Outlet</th><th>Platform</th><th>Periode</th><th>Bruto</th><th>Fee</th><th>Bersih</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
 }
 
@@ -800,8 +800,8 @@ function renderMutasi() {
       <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis">${f['Deskripsi Mutasi']||'-'}</td>
       <td><span class="badge ${sm==='Matched'?'badge-green':sm==='Tidak Dikenal'?'badge-red':'badge-yellow'}">${sm}</span></td>
     </tr>`;
-  }).join('') : `<tr><td colspan="7" class="empty-state"><div class="icon">[Bk]</div><div class="text">Belum ada data mutasi</div></td></tr>`;
-  return `<div class="section"><div class="section-header"><div class="section-title">[Bk] Mutasi Bank</div><button class="btn btn-primary btn-sm" onclick="showAddModal()">+ Input Mutasi</button></div>
+  }).join('') : `<tr><td colspan="7" class="empty-state"><div class="icon">≡</div><div class="text">Belum ada data mutasi</div></td></tr>`;
+  return `<div class="section"><div class="section-header"><div class="section-title">≡ Mutasi Bank</div><button class="btn btn-primary btn-sm" onclick="showAddModal()">+ Input Mutasi</button></div>
   <div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Rekening</th><th>Bank</th><th>Tipe</th><th>Nominal</th><th>Deskripsi</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
 }
 
@@ -820,8 +820,8 @@ function renderAsset() {
       <td>${fmtRp(f['Depresiasi Per Bulan']||0)}/bln</td>
       <td><span class="badge ${sa==='Aktif'?'badge-green':sa==='Rusak'?'badge-red':'badge-gray'}">${sa}</span></td>
     </tr>`;
-  }).join('') : `<tr><td colspan="8" class="empty-state"><div class="icon">[A]</div><div class="text">Belum ada data asset</div></td></tr>`;
-  return `<div class="section"><div class="section-header"><div class="section-title">[A] Asset / Capex</div><button class="btn btn-primary btn-sm" onclick="showAddModal()">+ Tambah Asset</button></div>
+  }).join('') : `<tr><td colspan="8" class="empty-state"><div class="icon">≡</div><div class="text">Belum ada data asset</div></td></tr>`;
+  return `<div class="section"><div class="section-header"><div class="section-title">≡ Asset / Capex</div><button class="btn btn-primary btn-sm" onclick="showAddModal()">+ Tambah Asset</button></div>
   <div class="table-wrap"><table><thead><tr><th>Tanggal Beli</th><th>Nama Asset</th><th>Outlet</th><th>Kategori</th><th>Harga Beli</th><th>Umur</th><th>Depresiasi</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
 }
 
@@ -836,8 +836,8 @@ function renderBersama() {
       <td>${f['Metode Pembagian']?.name||'-'}</td>
       <td>${dibebankan}</td>
     </tr>`;
-  }).join('') : `<tr><td colspan="5" class="empty-state"><div class="icon">[Bs]</div><div class="text">Belum ada data biaya bersama</div></td></tr>`;
-  return `<div class="section"><div class="section-header"><div class="section-title">[Bs] Biaya Bersama</div><button class="btn btn-primary btn-sm" onclick="showAddModal()">+ Tambah</button></div>
+  }).join('') : `<tr><td colspan="5" class="empty-state"><div class="icon">≡</div><div class="text">Belum ada data biaya bersama</div></td></tr>`;
+  return `<div class="section"><div class="section-header"><div class="section-title">≡ Biaya Bersama</div><button class="btn btn-primary btn-sm" onclick="showAddModal()">+ Tambah</button></div>
   <div class="table-wrap"><table><thead><tr><th>Tanggal</th><th>Nama Biaya</th><th>Total Nominal</th><th>Metode</th><th>Dibebankan Ke</th></tr></thead><tbody>${rows}</tbody></table></div></div>`;
 }
 
@@ -870,7 +870,7 @@ function renderSettings() {
         </div>
         <div class="settings-item">
           <div><div class="settings-item-label">Status</div></div>
-          <span class="badge ${demoMode?'badge-yellow':'badge-green'}">${demoMode?'Demo Mode':'OK Terhubung'}</span>
+          <span class="badge ${demoMode?'badge-yellow':'badge-green'}">${demoMode?'Demo Mode':'Terhubung'}</span>
         </div>
         <div class="settings-item">
           <div><div class="settings-item-label">Token</div></div>
@@ -878,12 +878,12 @@ function renderSettings() {
         <div class="token-display">${token}</div>
         <div style="margin-top:12px;display:flex;gap:8px">
           <button class="btn btn-outline btn-sm" onclick="gantiToken()" style="flex:1">🔑 Ganti Token</button>
-          <button class="btn btn-sm" style="background:var(--red);color:#fff;flex:1" onclick="resetToken()">[X] Logout</button>
+          <button class="btn btn-sm" style="background:var(--red);color:#fff;flex:1" onclick="resetToken()">Logout</button>
         </div>
       </div>
     </div>
     <div class="settings-card">
-      <div class="settings-card-header">[O] Outlet (${masterOutlets.length})<button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="addOutletModal()">+ Tambah</button></div>
+      <div class="settings-card-header">⊙ Outlet (${masterOutlets.length})<button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="addOutletModal()">+ Tambah</button></div>
       <div class="settings-card-body">${outletList}</div>
     </div>
     <div class="settings-card">
@@ -891,14 +891,14 @@ function renderSettings() {
       <div class="settings-card-body">${picList}</div>
     </div>
     <div class="settings-card">
-      <div class="settings-card-header">[App] Web App Info</div>
+      <div class="settings-card-header">App Web App Info</div>
       <div class="settings-card-body">
         <div class="settings-item"><div class="settings-item-label">Versi</div><span class="settings-item-val">v2.0</span></div>
         <div class="settings-item"><div class="settings-item-label">Database</div><span class="settings-item-val">Airtable Cloud</span></div>
         <div class="settings-item"><div class="settings-item-label">Notifikasi</div><span class="settings-item-val">Telegram @FinanceNF3Bot</span></div>
         <div class="settings-item"><div class="settings-item-label">Outlets Aktif</div><span class="settings-item-val">${masterOutlets.length}</span></div>
         <div style="margin-top:12px">
-          <button class="btn btn-blue btn-sm" style="width:100%" onclick="refreshAll()">[R] Refresh Semua Data</button>
+          <button class="btn btn-blue btn-sm" style="width:100%" onclick="refreshAll()">Refresh Semua Data</button>
         </div>
       </div>
     </div>
@@ -912,7 +912,7 @@ function showAddModal() {
   currentModalType = currentPage;
   const configs = {
     kas: {
-      title: '[K] Input Kas Harian',
+      title: '$ Input Kas Harian',
       body: `
         <div class="form-row">
           <div class="form-group"><label>Tanggal <span class="required">*</span></label><input type="date" id="mTanggal" value="${today()}"></div>
@@ -934,7 +934,7 @@ function showAddModal() {
         <div class="form-group"><label>Catatan</label><textarea id="mCatatan" placeholder="Catatan opsional..."></textarea></div>`
     },
     pengeluaran: {
-      title: '[B] Tambah Pengeluaran',
+      title: '≡ Tambah Pengeluaran',
       body: `
         <div class="form-row">
           <div class="form-group"><label>Tanggal <span class="required">*</span></label><input type="date" id="mTanggal" value="${today()}"></div>
@@ -960,7 +960,7 @@ function showAddModal() {
         </div>`
     },
     uangmasuk: {
-      title: '[M] Tambah Uang Masuk',
+      title: '↓ Tambah Uang Masuk',
       body: `
         <div class="form-row">
           <div class="form-group"><label>Tanggal <span class="required">*</span></label><input type="date" id="mTanggal" value="${today()}"></div>
@@ -989,7 +989,7 @@ function showAddModal() {
         <div class="form-group"><label>Catatan</label><textarea id="mCatatan" placeholder="Catatan opsional..."></textarea></div>`
     },
     marketplace: {
-      title: '[S] Upload Data Marketplace',
+      title: '⊞ Upload Data Marketplace',
       body: `
         <div class="form-row">
           <div class="form-group"><label>Tanggal Upload <span class="required">*</span></label><input type="date" id="mTanggal" value="${today()}"></div>
@@ -1014,7 +1014,7 @@ function showAddModal() {
         </div>`
     },
     mutasi: {
-      title: '[Bk] Input Mutasi Bank',
+      title: '≡ Input Mutasi Bank',
       body: `
         <div class="form-row">
           <div class="form-group"><label>Tanggal <span class="required">*</span></label><input type="date" id="mTanggal" value="${today()}"></div>
@@ -1036,7 +1036,7 @@ function showAddModal() {
         <div class="form-group"><label>Deskripsi Mutasi</label><textarea id="mDeskripsi" placeholder="Deskripsi dari rekening koran..."></textarea></div>`
     },
     asset: {
-      title: '[A] Tambah Asset / Capex',
+      title: '≡ Tambah Asset / Capex',
       body: `
         <div class="form-row">
           <div class="form-group"><label>Tanggal Beli <span class="required">*</span></label><input type="date" id="mTanggal" value="${today()}"></div>
@@ -1059,7 +1059,7 @@ function showAddModal() {
         <div class="form-group"><label>Catatan</label><textarea id="mCatatan" placeholder="Catatan opsional..."></textarea></div>`
     },
     bersama: {
-      title: '[Bs] Tambah Biaya Bersama',
+      title: '≡ Tambah Biaya Bersama',
       body: `
         <div class="form-row">
           <div class="form-group"><label>Tanggal <span class="required">*</span></label><input type="date" id="mTanggal" value="${today()}"></div>
@@ -1096,17 +1096,17 @@ function showAddModal() {
 async function saveModal() {
   const btn = document.getElementById('addModalSave');
   btn.disabled = true;
-  btn.textContent = '[W] Menyimpan...';
+  btn.textContent = '◔ Menyimpan...';
   try {
     await saveByType(currentModalType);
     closeModal();
     await loadPageData(currentPage);
     renderPage(currentPage);
     if (currentPage==='dashboard'||currentPage==='kas') updateDashboard();
-    showToast('OK Data berhasil disimpan','success');
+    showToast('Data berhasil disimpan','success');
     sendWebhookIfNeeded(currentModalType);
   } catch(e) {
-    showToast('ERROR Gagal: '+e.message,'error');
+    showToast('Gagal: '+e.message,'error');
   } finally {
     btn.disabled = false;
     btn.textContent = '💾 Simpan';
@@ -1236,7 +1236,7 @@ async function saveByType(type) {
 // SETTINGS — OUTLET & PIC
 // ============================================================
 function addOutletModal() {
-  document.getElementById('settingsModalTitle').textContent = '[O] Tambah Outlet Baru';
+  document.getElementById('settingsModalTitle').textContent = '⊙ Tambah Outlet Baru';
   document.getElementById('settingsModalBody').innerHTML = `
     <div class="form-group"><label>Nama Outlet <span class="required">*</span></label><input type="text" id="smNama" placeholder="cth: Kopi Buri Umah"></div>
     <div class="form-group"><label>Tipe Bisnis</label><select id="smTipe">
@@ -1255,8 +1255,8 @@ function addOutletModal() {
       closeSettingsModal();
       await loadMasterData();
       renderPage('settings');
-      showToast('OK Outlet berhasil ditambah','success');
-    } catch(e) { showToast('ERROR '+e.message,'error'); }
+      showToast('Outlet berhasil ditambah','success');
+    } catch(e) { showToast('Gagal: '+e.message,'error'); }
   };
   document.getElementById('settingsModalOverlay').classList.add('show');
 }
@@ -1286,8 +1286,8 @@ function editOutlet(id, nama, tipe, status) {
       closeSettingsModal();
       await loadMasterData();
       renderPage('settings');
-      showToast('OK Outlet berhasil diupdate','success');
-    } catch(e) { showToast('ERROR '+e.message,'error'); }
+      showToast('Outlet berhasil diupdate','success');
+    } catch(e) { showToast('Gagal: '+e.message,'error'); }
   };
   document.getElementById('settingsModalOverlay').classList.add('show');
 }
@@ -1317,8 +1317,8 @@ function addPICModal() {
       closeSettingsModal();
       await loadMasterData();
       renderPage('settings');
-      showToast('OK PIC berhasil ditambah','success');
-    } catch(e) { showToast('ERROR '+e.message,'error'); }
+      showToast('PIC berhasil ditambah','success');
+    } catch(e) { showToast('Gagal: '+e.message,'error'); }
   };
   document.getElementById('settingsModalOverlay').classList.add('show');
 }
@@ -1343,8 +1343,8 @@ function editPIC(id, nama, role) {
       closeSettingsModal();
       await loadMasterData();
       renderPage('settings');
-      showToast('OK PIC berhasil diupdate','success');
-    } catch(e) { showToast('ERROR '+e.message,'error'); }
+      showToast('PIC berhasil diupdate','success');
+    } catch(e) { showToast('Gagal: '+e.message,'error'); }
   };
   document.getElementById('settingsModalOverlay').classList.add('show');
 }
@@ -1361,7 +1361,7 @@ async function validasiKas(recordId) {
       : r);
     renderPage(currentPage);
     if (currentPage==='dashboard') updateDashboard();
-    showToast('OK Kas berhasil divalidasi','success');
+    showToast('Kas berhasil divalidasi','success');
     // Cek selisih & kirim webhook
     const rec = allKas.find(r=>r.id===recordId);
     if (rec) {
@@ -1370,7 +1370,7 @@ async function validasiKas(recordId) {
         triggerSelisihWebhook(rec);
       }
     }
-  } catch(e) { showToast('ERROR '+e.message,'error'); }
+  } catch(e) { showToast('Gagal: '+e.message,'error'); }
 }
 
 function triggerSelisihWebhook(rec) {
